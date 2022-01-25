@@ -1,0 +1,11 @@
+name: todo-nodejs-mongo
+services:
+  - name: ${BASENAME}api
+    project: ../src/api
+    language: java
+    type: app
+  - name: ${BASENAME}web
+    project: ../src/web
+    dist: build
+    language: js
+    type: app
