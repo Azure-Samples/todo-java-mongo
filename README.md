@@ -1,57 +1,33 @@
-# Project Name
+# Java with Spring Boot REST API
 
-(short, 1-3 sentenced, description of the project)
-
-## Features
-
-This project framework provides the following features:
-
-* Feature 1
-* Feature 2
-* ...
-
-## Getting Started
+## Setup
 
 ### Prerequisites
 
-(ideally very short, if any)
+- Java 11 or later
 
-- OS
-- Library version
-- ...
+### Local Environment
 
-### Installation
+Create a `.env` with the following configuration:
 
-(ideally very short)
+- `SPRING_DATA_MONGODB_URI` - Cosmos DB connection string (Mongo DB also supported)
 
-- npm install [package name]
-- mvn install
-- ...
+### Build & Compile
 
-### Quickstart
-(Add steps to get up and running quickly)
+Run `./mvnw package` to build & compile the application in the `target` directory.
 
-1. git clone [repository clone url]
-2. cd [respository name]
-3. ...
+### Run application
 
+Run `./mvnw spring-boot:run` to start the local development server.
 
-## Demo
+The REST API will be available at `http://localhost:8080`.
 
-A demo app is included to show how to use the project.
+### Build the Docker image
 
-To run the demo, follow these steps:
+Run `./mvnw spring-boot:build-image` to build the Docker image.
 
-(Add steps to start up the demo)
+### Run the Docker image
 
-1.
-2.
-3.
+The environment variable `SPRING_DATA_MONGODB_URI` must point to the Cosmos DB connection string.
 
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+Run `docker run -it -p 8080:8080 -e SPRING_DATA_MONGODB_URI=$SPRING_DATA_MONGODB_URI azure/azure-dev-todo-java` to start the Docker image.
