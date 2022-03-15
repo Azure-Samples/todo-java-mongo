@@ -8,7 +8,12 @@ package com.microsoft.azure.simpletodo.api;
 import com.microsoft.azure.simpletodo.model.TodoItem;
 import com.microsoft.azure.simpletodo.model.TodoList;
 import com.microsoft.azure.simpletodo.model.TodoState;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +21,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import javax.annotation.Generated;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-01-24T15:32:56.631412+01:00[Europe/Paris]")
+
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-03-15T23:06:05.934415+01:00[Europe/Berlin]")
 @Validated
-@Api(value = "lists", description = "the lists API")
+@Tag(name = "lists", description = "the lists API")
 public interface ListsApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -30,31 +37,36 @@ public interface ListsApi {
     }
 
     /**
-     * GET /lists : Gets an array of Todo lists
+     * POST /lists/{listId}/items : Creates a new Todo item within a list
      *
-     * @param top The max number of items to returns in a result (optional)
-     * @param skip The number of items to skip within the results (optional)
-     * @return A Todo list result (status code 200)
+     * @param listId   The Todo list unique identifier (required)
+     * @param todoItem The Todo Item (optional)
+     * @return A Todo item result (status code 201)
+     * or Todo list not found (status code 404)
      */
-
-    @ApiOperation(value = "Gets an array of Todo lists", nickname = "listsGet", notes = "", response = TodoList.class, tags={ "Lists", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 200, message = "A Todo list result", response = TodoList.class) })
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/lists",
-        produces = { "application/json" }
+    @Operation(
+            operationId = "createItem",
+            summary = "Creates a new Todo item within a list",
+            tags = {"Items"},
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "A Todo item result", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TodoItem.class))),
+                    @ApiResponse(responseCode = "404", description = "Todo list not found")
+            }
     )
-    default ResponseEntity<TodoList> listsGet(@ApiParam(value = "The max number of items to returns in a result") @Valid @RequestParam(value = "top", required = false) BigDecimal top
-
-,@ApiParam(value = "The number of items to skip within the results") @Valid @RequestParam(value = "skip", required = false) BigDecimal skip
-
-) {
+    @RequestMapping(
+            method = RequestMethod.POST,
+            value = "/lists/{listId}/items",
+            produces = {"application/json"},
+            consumes = {"application/json"}
+    )
+    default ResponseEntity<TodoItem> createItem(
+            @Parameter(name = "listId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("listId") String listId,
+            @Parameter(name = "TodoItem", description = "The Todo Item", schema = @Schema(description = "")) @Valid @RequestBody(required = false) TodoItem todoItem
+    ) {
         getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" }";
+                    String exampleString = "{ \"listId\" : \"listId\", \"dueDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"completedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -66,97 +78,32 @@ public interface ListsApi {
 
 
     /**
-     * DELETE /lists/{listId} : Deletes a Todo list by unique identifier
+     * POST /lists : Creates a new Todo list
      *
-     * @param listId The Todo list unique identifier (required)
-     * @return Todo list deleted successfully (status code 204)
-     *         or Todo list not found (status code 404)
+     * @param todoList The Todo List (optional)
+     * @return A Todo list result (status code 201)
+     * or Invalid request schema (status code 400)
      */
-
-    @ApiOperation(value = "Deletes a Todo list by unique identifier", nickname = "listsListIdDelete", notes = "", tags={ "Lists", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 204, message = "Todo list deleted successfully"),
-
-        @ApiResponse(code = 404, message = "Todo list not found") })
-    @RequestMapping(
-        method = RequestMethod.DELETE,
-        value = "/lists/{listId}"
-    )
-    default ResponseEntity<Void> listsListIdDelete(@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("listId") String listId
-
-) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * GET /lists/{listId} : Gets a Todo list by unique identifier
-     *
-     * @param listId The Todo list unique identifier (required)
-     * @return A Todo list result (status code 200)
-     *         or Todo list not found (status code 404)
-     */
-
-    @ApiOperation(value = "Gets a Todo list by unique identifier", nickname = "listsListIdGet", notes = "", response = TodoList.class, tags={ "Lists", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 200, message = "A Todo list result", response = TodoList.class),
-
-        @ApiResponse(code = 404, message = "Todo list not found") })
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/lists/{listId}",
-        produces = { "application/json" }
-    )
-    default ResponseEntity<TodoList> listsListIdGet(@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("listId") String listId
-
-) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
+    @Operation(
+            operationId = "createList",
+            summary = "Creates a new Todo list",
+            tags = {"Lists"},
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "A Todo list result", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TodoList.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid request schema")
             }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * GET /lists/{listId}/items : Gets Todo items within the specified list
-     *
-     * @param listId The Todo list unique identifier (required)
-     * @param top The max number of items to returns in a result (optional)
-     * @param skip The number of items to skip within the results (optional)
-     * @return An array of Todo lists (status code 200)
-     *         or Todo list not found (status code 404)
-     */
-
-    @ApiOperation(value = "Gets Todo items within the specified list", nickname = "listsListIdItemsGet", notes = "", response = TodoList.class, responseContainer = "List", tags={ "Items", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 200, message = "An array of Todo lists", response = TodoList.class, responseContainer = "List"),
-
-        @ApiResponse(code = 404, message = "Todo list not found") })
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/lists/{listId}/items",
-        produces = { "application/json" }
     )
-    default ResponseEntity<List<TodoList>> listsListIdItemsGet(@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("listId") String listId
-
-,@ApiParam(value = "The max number of items to returns in a result") @Valid @RequestParam(value = "top", required = false) BigDecimal top
-
-,@ApiParam(value = "The number of items to skip within the results") @Valid @RequestParam(value = "skip", required = false) BigDecimal skip
-
-) {
+    @RequestMapping(
+            method = RequestMethod.POST,
+            value = "/lists",
+            produces = {"application/json"},
+            consumes = {"application/json"}
+    )
+    default ResponseEntity<TodoList> createList(
+            @Parameter(name = "TodoList", description = "The Todo List", schema = @Schema(description = "")) @Valid @RequestBody(required = false) TodoList todoList
+    ) {
         getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
@@ -174,35 +121,54 @@ public interface ListsApi {
      *
      * @param listId The Todo list unique identifier (required)
      * @param itemId The Todo list unique identifier (required)
-     * @return A Todo item result (status code 204)
-     *         or Todo list or item not found (status code 404)
+     * @return Todo item deleted successfully (status code 204)
+     * or Todo list or item not found (status code 404)
      */
-
-    @ApiOperation(value = "Deletes a Todo item by unique identifier", nickname = "listsListIdItemsItemIdDelete", notes = "", response = TodoItem.class, tags={ "Items", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 204, message = "A Todo item result", response = TodoItem.class),
-
-        @ApiResponse(code = 404, message = "Todo list or item not found") })
-    @RequestMapping(
-        method = RequestMethod.DELETE,
-        value = "/lists/{listId}/items/{itemId}",
-        produces = { "application/json" }
-    )
-    default ResponseEntity<TodoItem> listsListIdItemsItemIdDelete(@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("listId") String listId
-
-,@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("itemId") String itemId
-
-) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"listId\" : \"listId\", \"dueDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"completedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
+    @Operation(
+            operationId = "deleteItemById",
+            summary = "Deletes a Todo item by unique identifier",
+            tags = {"Items"},
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Todo item deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "Todo list or item not found")
             }
-        });
+    )
+    @RequestMapping(
+            method = RequestMethod.DELETE,
+            value = "/lists/{listId}/items/{itemId}"
+    )
+    default ResponseEntity<Void> deleteItemById(
+            @Parameter(name = "listId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("listId") String listId,
+            @Parameter(name = "itemId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("itemId") String itemId
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * DELETE /lists/{listId} : Deletes a Todo list by unique identifier
+     *
+     * @param listId The Todo list unique identifier (required)
+     * @return Todo list deleted successfully (status code 204)
+     * or Todo list not found (status code 404)
+     */
+    @Operation(
+            operationId = "deleteListById",
+            summary = "Deletes a Todo list by unique identifier",
+            tags = {"Lists"},
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Todo list deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "Todo list not found")
+            }
+    )
+    @RequestMapping(
+            method = RequestMethod.DELETE,
+            value = "/lists/{listId}"
+    )
+    default ResponseEntity<Void> deleteListById(
+            @Parameter(name = "listId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("listId") String listId
+    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -214,27 +180,28 @@ public interface ListsApi {
      * @param listId The Todo list unique identifier (required)
      * @param itemId The Todo list unique identifier (required)
      * @return A Todo item result (status code 200)
-     *         or Todo list or item not found (status code 404)
+     * or Todo list or item not found (status code 404)
      */
-
-    @ApiOperation(value = "Gets a Todo item by unique identifier", nickname = "listsListIdItemsItemIdGet", notes = "", response = TodoItem.class, tags={ "Items", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 200, message = "A Todo item result", response = TodoItem.class),
-
-        @ApiResponse(code = 404, message = "Todo list or item not found") })
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/lists/{listId}/items/{itemId}",
-        produces = { "application/json" }
+    @Operation(
+            operationId = "getItemById",
+            summary = "Gets a Todo item by unique identifier",
+            tags = {"Items"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "A Todo item result", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TodoItem.class))),
+                    @ApiResponse(responseCode = "404", description = "Todo list or item not found")
+            }
     )
-    default ResponseEntity<TodoItem> listsListIdItemsItemIdGet(@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("listId") String listId
-
-,@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("itemId") String itemId
-
-) {
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/lists/{listId}/items/{itemId}",
+            produces = {"application/json"}
+    )
+    default ResponseEntity<TodoItem> getItemById(
+            @Parameter(name = "listId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("listId") String listId,
+            @Parameter(name = "itemId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("itemId") String itemId
+    ) {
         getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"listId\" : \"listId\", \"dueDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"completedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
@@ -248,79 +215,35 @@ public interface ListsApi {
 
 
     /**
-     * PUT /lists/{listId}/items/{itemId} : Updates a Todo item by unique identifier
+     * GET /lists/{listId}/items : Gets Todo items within the specified list
      *
      * @param listId The Todo list unique identifier (required)
-     * @param itemId The Todo list unique identifier (required)
-     * @param todoItem The Todo Item (optional)
-     * @return A Todo item result (status code 200)
-     *         or Todo item is invalid (status code 400)
-     *         or Todo list or item not found (status code 404)
+     * @param top    The max number of items to returns in a result (optional)
+     * @param skip   The number of items to skip within the results (optional)
+     * @return An array of Todo items (status code 200)
+     * or Todo list not found (status code 404)
      */
-
-    @ApiOperation(value = "Updates a Todo item by unique identifier", nickname = "listsListIdItemsItemIdPut", notes = "", response = TodoItem.class, tags={ "Items", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 200, message = "A Todo item result", response = TodoItem.class),
-
-        @ApiResponse(code = 400, message = "Todo item is invalid"),
-
-        @ApiResponse(code = 404, message = "Todo list or item not found") })
-    @RequestMapping(
-        method = RequestMethod.PUT,
-        value = "/lists/{listId}/items/{itemId}",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    default ResponseEntity<TodoItem> listsListIdItemsItemIdPut(@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("listId") String listId
-
-,@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("itemId") String itemId
-
-,
-
-@ApiParam(value = "The Todo Item" )   @Valid @RequestBody(required = false) TodoItem todoItem) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"listId\" : \"listId\", \"dueDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"completedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
+    @Operation(
+            operationId = "getItemsByListId",
+            summary = "Gets Todo items within the specified list",
+            tags = {"Items"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "An array of Todo items", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TodoItem.class))),
+                    @ApiResponse(responseCode = "404", description = "Todo list not found")
             }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * POST /lists/{listId}/items : Creates a new Todo item within a list
-     *
-     * @param listId The Todo list unique identifier (required)
-     * @param todoItem The Todo Item (optional)
-     * @return A Todo item result (status code 201)
-     *         or Todo list not found (status code 404)
-     */
-
-    @ApiOperation(value = "Creates a new Todo item within a list", nickname = "listsListIdItemsPost", notes = "", response = TodoItem.class, tags={ "Items", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 201, message = "A Todo item result", response = TodoItem.class),
-
-        @ApiResponse(code = 404, message = "Todo list not found") })
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/lists/{listId}/items",
-        produces = { "application/json" },
-        consumes = { "application/json" }
     )
-    default ResponseEntity<TodoItem> listsListIdItemsPost(@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("listId") String listId
-
-,
-
-@ApiParam(value = "The Todo Item" )   @Valid @RequestBody(required = false) TodoItem todoItem) {
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/lists/{listId}/items",
+            produces = {"application/json"}
+    )
+    default ResponseEntity<List<TodoItem>> getItemsByListId(
+            @Parameter(name = "listId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("listId") String listId,
+            @Parameter(name = "top", description = "The max number of items to returns in a result", schema = @Schema(description = "")) @Valid @RequestParam(value = "top", required = false) BigDecimal top,
+            @Parameter(name = "skip", description = "The number of items to skip within the results", schema = @Schema(description = "")) @Valid @RequestParam(value = "skip", required = false) BigDecimal skip
+    ) {
         getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"listId\" : \"listId\", \"dueDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"completedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
@@ -337,35 +260,155 @@ public interface ListsApi {
      * GET /lists/{listId}/items/state/{state} : Gets a list of Todo items of a specific state
      *
      * @param listId The Todo list unique identifier (required)
-     * @param state The Todo item state (required)
-     * @param top The max number of items to returns in a result (optional)
-     * @param skip The number of items to skip within the results (optional)
+     * @param state  The Todo item state (required)
+     * @param top    The max number of items to returns in a result (optional)
+     * @param skip   The number of items to skip within the results (optional)
      * @return An array of Todo items (status code 200)
-     *         or Todo list or item not found (status code 404)
+     * or Todo list or item not found (status code 404)
      */
-
-    @ApiOperation(value = "Gets a list of Todo items of a specific state", nickname = "listsListIdItemsStateStateGet", notes = "", response = TodoItem.class, responseContainer = "List", tags={ "Items", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 200, message = "An array of Todo items", response = TodoItem.class, responseContainer = "List"),
-
-        @ApiResponse(code = 404, message = "Todo list or item not found") })
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/lists/{listId}/items/state/{state}",
-        produces = { "application/json" }
+    @Operation(
+            operationId = "getItemsByListIdAndState",
+            summary = "Gets a list of Todo items of a specific state",
+            tags = {"Items"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "An array of Todo items", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TodoItem.class))),
+                    @ApiResponse(responseCode = "404", description = "Todo list or item not found")
+            }
     )
-    default ResponseEntity<List<TodoItem>> listsListIdItemsStateStateGet(@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("listId") String listId
-
-,@ApiParam(value = "The Todo item state", required = true, allowableValues = "todo, inprogress, done") @PathVariable("state") TodoState state
-
-,@ApiParam(value = "The max number of items to returns in a result") @Valid @RequestParam(value = "top", required = false) BigDecimal top
-
-,@ApiParam(value = "The number of items to skip within the results") @Valid @RequestParam(value = "skip", required = false) BigDecimal skip
-
-) {
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/lists/{listId}/items/state/{state}",
+            produces = {"application/json"}
+    )
+    default ResponseEntity<List<TodoItem>> getItemsByListIdAndState(
+            @Parameter(name = "listId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("listId") String listId,
+            @Parameter(name = "state", description = "The Todo item state", required = true, schema = @Schema(description = "", allowableValues = {"todo", "inprogress", "done"})) @PathVariable("state") TodoState state,
+            @Parameter(name = "top", description = "The max number of items to returns in a result", schema = @Schema(description = "")) @Valid @RequestParam(value = "top", required = false) BigDecimal top,
+            @Parameter(name = "skip", description = "The number of items to skip within the results", schema = @Schema(description = "")) @Valid @RequestParam(value = "skip", required = false) BigDecimal skip
+    ) {
         getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"listId\" : \"listId\", \"dueDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"completedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /lists/{listId} : Gets a Todo list by unique identifier
+     *
+     * @param listId The Todo list unique identifier (required)
+     * @return A Todo list result (status code 200)
+     * or Todo list not found (status code 404)
+     */
+    @Operation(
+            operationId = "getListById",
+            summary = "Gets a Todo list by unique identifier",
+            tags = {"Lists"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "A Todo list result", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TodoList.class))),
+                    @ApiResponse(responseCode = "404", description = "Todo list not found")
+            }
+    )
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/lists/{listId}",
+            produces = {"application/json"}
+    )
+    default ResponseEntity<TodoList> getListById(
+            @Parameter(name = "listId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("listId") String listId
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /lists : Gets an array of Todo lists
+     *
+     * @param top  The max number of items to returns in a result (optional)
+     * @param skip The number of items to skip within the results (optional)
+     * @return An array of Todo lists (status code 200)
+     */
+    @Operation(
+            operationId = "getLists",
+            summary = "Gets an array of Todo lists",
+            tags = {"Lists"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "An array of Todo lists", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TodoList.class)))
+            }
+    )
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/lists",
+            produces = {"application/json"}
+    )
+    default ResponseEntity<List<TodoList>> getLists(
+            @Parameter(name = "top", description = "The max number of items to returns in a result", schema = @Schema(description = "")) @Valid @RequestParam(value = "top", required = false) BigDecimal top,
+            @Parameter(name = "skip", description = "The number of items to skip within the results", schema = @Schema(description = "")) @Valid @RequestParam(value = "skip", required = false) BigDecimal skip
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PUT /lists/{listId}/items/{itemId} : Updates a Todo item by unique identifier
+     *
+     * @param listId   The Todo list unique identifier (required)
+     * @param itemId   The Todo list unique identifier (required)
+     * @param todoItem The Todo Item (optional)
+     * @return A Todo item result (status code 200)
+     * or Todo item is invalid (status code 400)
+     * or Todo list or item not found (status code 404)
+     */
+    @Operation(
+            operationId = "updateItemById",
+            summary = "Updates a Todo item by unique identifier",
+            tags = {"Items"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "A Todo item result", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TodoItem.class))),
+                    @ApiResponse(responseCode = "400", description = "Todo item is invalid"),
+                    @ApiResponse(responseCode = "404", description = "Todo list or item not found")
+            }
+    )
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            value = "/lists/{listId}/items/{itemId}",
+            produces = {"application/json"},
+            consumes = {"application/json"}
+    )
+    default ResponseEntity<TodoItem> updateItemById(
+            @Parameter(name = "listId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("listId") String listId,
+            @Parameter(name = "itemId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("itemId") String itemId,
+            @Parameter(name = "TodoItem", description = "The Todo Item", schema = @Schema(description = "")) @Valid @RequestBody(required = false) TodoItem todoItem
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"listId\" : \"listId\", \"dueDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\", \"completedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
@@ -381,31 +424,31 @@ public interface ListsApi {
     /**
      * PUT /lists/{listId}/items/state/{state} : Changes the state of the specified list items
      *
-     * @param listId The Todo list unique identifier (required)
-     * @param state The Todo item state (required)
-     * @param requestBody  (optional)
+     * @param listId      The Todo list unique identifier (required)
+     * @param state       The Todo item state (required)
+     * @param requestBody (optional)
      * @return Todo items updated (status code 204)
-     *         or Update request is invalid (status code 400)
+     * or Update request is invalid (status code 400)
      */
-
-    @ApiOperation(value = "Changes the state of the specified list items", nickname = "listsListIdItemsStateStatePut", notes = "", tags={ "Items", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 204, message = "Todo items updated"),
-
-        @ApiResponse(code = 400, message = "Update request is invalid") })
-    @RequestMapping(
-        method = RequestMethod.PUT,
-        value = "/lists/{listId}/items/state/{state}",
-        consumes = { "application/json" }
+    @Operation(
+            operationId = "updateItemsStateByListId",
+            summary = "Changes the state of the specified list items",
+            tags = {"Items"},
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Todo items updated"),
+                    @ApiResponse(responseCode = "400", description = "Update request is invalid")
+            }
     )
-    default ResponseEntity<Void> listsListIdItemsStateStatePut(@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("listId") String listId
-
-,@ApiParam(value = "The Todo item state", required = true, allowableValues = "todo, inprogress, done") @PathVariable("state") TodoState state
-
-,
-
-@ApiParam(value = "" )   @Valid @RequestBody(required = false) List<String> requestBody) {
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            value = "/lists/{listId}/items/state/{state}",
+            consumes = {"application/json"}
+    )
+    default ResponseEntity<Void> updateItemsStateByListId(
+            @Parameter(name = "listId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("listId") String listId,
+            @Parameter(name = "state", description = "The Todo item state", required = true, schema = @Schema(description = "", allowableValues = {"todo", "inprogress", "done"})) @PathVariable("state") TodoState state,
+            @Parameter(name = "request_body", description = "", schema = @Schema(description = "")) @Valid @RequestBody(required = false) List<String> requestBody
+    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -414,68 +457,32 @@ public interface ListsApi {
     /**
      * PUT /lists/{listId} : Updates a Todo list by unique identifier
      *
-     * @param listId The Todo list unique identifier (required)
+     * @param listId   The Todo list unique identifier (required)
      * @param todoList The Todo List (optional)
      * @return A Todo list result (status code 200)
-     *         or Todo list is invalid (status code 400)
+     * or Todo list is invalid (status code 400)
      */
-
-    @ApiOperation(value = "Updates a Todo list by unique identifier", nickname = "listsListIdPut", notes = "", response = TodoList.class, tags={ "Lists", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 200, message = "A Todo list result", response = TodoList.class),
-
-        @ApiResponse(code = 400, message = "Todo list is invalid") })
-    @RequestMapping(
-        method = RequestMethod.PUT,
-        value = "/lists/{listId}",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    default ResponseEntity<TodoList> listsListIdPut(@ApiParam(value = "The Todo list unique identifier", required = true) @PathVariable("listId") String listId
-
-,
-
-@ApiParam(value = "The Todo List" )   @Valid @RequestBody(required = false) TodoList todoList) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
+    @Operation(
+            operationId = "updateListById",
+            summary = "Updates a Todo list by unique identifier",
+            tags = {"Lists"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "A Todo list result", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TodoList.class))),
+                    @ApiResponse(responseCode = "400", description = "Todo list is invalid")
             }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * POST /lists : Creates a new Todo list
-     *
-     * @param todoList The Todo List (optional)
-     * @return A Todo list result (status code 201)
-     *         or Invalid request schema (status code 400)
-     */
-
-    @ApiOperation(value = "Creates a new Todo list", nickname = "listsPost", notes = "", response = TodoList.class, tags={ "Lists", })
-    @ApiResponses(value = {
-
-        @ApiResponse(code = 201, message = "A Todo list result", response = TodoList.class),
-
-        @ApiResponse(code = 400, message = "Invalid request schema") })
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/lists",
-        produces = { "application/json" },
-        consumes = { "application/json" }
     )
-    default ResponseEntity<TodoList> listsPost(
-
-@ApiParam(value = "The Todo List" )   @Valid @RequestBody(required = false) TodoList todoList) {
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            value = "/lists/{listId}",
+            produces = {"application/json"},
+            consumes = {"application/json"}
+    )
+    default ResponseEntity<TodoList> updateListById(
+            @Parameter(name = "listId", description = "The Todo list unique identifier", required = true, schema = @Schema(description = "")) @PathVariable("listId") String listId,
+            @Parameter(name = "TodoList", description = "The Todo List", schema = @Schema(description = "")) @Valid @RequestBody(required = false) TodoList todoList
+    ) {
         getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+            for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"name\" : \"name\", \"description\" : \"description\", \"id\" : \"id\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);

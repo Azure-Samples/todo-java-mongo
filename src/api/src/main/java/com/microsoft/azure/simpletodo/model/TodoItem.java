@@ -1,11 +1,10 @@
 package com.microsoft.azure.simpletodo.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
@@ -14,15 +13,14 @@ import java.util.Objects;
 /**
  * A task that needs to be completed
  */
-@ApiModel(description = "A task that needs to be completed")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-01-24T15:32:56.631412+01:00[Europe/Paris]")
+
+@Schema(name = "TodoItem", description = "A task that needs to be completed")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-03-15T23:13:58.701016+01:00[Europe/Berlin]")
 public class TodoItem {
 
-    @Id
     @JsonProperty("id")
     private String id;
 
-    @Indexed
     @JsonProperty("listId")
     private String listId;
 
@@ -32,16 +30,15 @@ public class TodoItem {
     @JsonProperty("description")
     private String description;
 
-    @Indexed
     @JsonProperty("state")
     private TodoState state;
 
     @JsonProperty("dueDate")
-    @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private OffsetDateTime dueDate;
 
     @JsonProperty("completedDate")
-    @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private OffsetDateTime completedDate;
 
     public TodoItem id(String id) {
@@ -54,7 +51,8 @@ public class TodoItem {
      *
      * @return id
      */
-    @ApiModelProperty(value = "")
+
+    @Schema(name = "id", required = false)
     public String getId() {
         return id;
     }
@@ -73,8 +71,8 @@ public class TodoItem {
      *
      * @return listId
      */
-    @ApiModelProperty(required = true, value = "")
     @NotNull
+    @Schema(name = "listId", required = true)
     public String getListId() {
         return listId;
     }
@@ -93,8 +91,8 @@ public class TodoItem {
      *
      * @return name
      */
-    @ApiModelProperty(required = true, value = "")
     @NotNull
+    @Schema(name = "name", required = true)
     public String getName() {
         return name;
     }
@@ -113,8 +111,8 @@ public class TodoItem {
      *
      * @return description
      */
-    @ApiModelProperty(required = true, value = "")
     @NotNull
+    @Schema(name = "description", required = true)
     public String getDescription() {
         return description;
     }
@@ -133,8 +131,8 @@ public class TodoItem {
      *
      * @return state
      */
-    @ApiModelProperty(value = "")
     @Valid
+    @Schema(name = "state", required = false)
     public TodoState getState() {
         return state;
     }
@@ -153,8 +151,8 @@ public class TodoItem {
      *
      * @return dueDate
      */
-    @ApiModelProperty(value = "")
     @Valid
+    @Schema(name = "dueDate", required = false)
     public OffsetDateTime getDueDate() {
         return dueDate;
     }
@@ -173,8 +171,8 @@ public class TodoItem {
      *
      * @return completedDate
      */
-    @ApiModelProperty(value = "")
     @Valid
+    @Schema(name = "completedDate", required = false)
     public OffsetDateTime getCompletedDate() {
         return completedDate;
     }
@@ -210,7 +208,6 @@ public class TodoItem {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class TodoItem {\n");
-
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    listId: ").append(toIndentedString(listId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");

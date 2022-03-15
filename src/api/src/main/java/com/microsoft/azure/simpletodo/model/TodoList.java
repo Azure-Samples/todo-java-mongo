@@ -1,21 +1,20 @@
 package com.microsoft.azure.simpletodo.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import org.springframework.data.annotation.Id;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
  * A list of related Todo items
  */
-@ApiModel(description = " A list of related Todo items")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-01-24T15:32:56.631412+01:00[Europe/Paris]")
+
+@Schema(name = "TodoList", description = " A list of related Todo items")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-03-15T23:13:58.701016+01:00[Europe/Berlin]")
 public class TodoList {
 
-    @Id
     @JsonProperty("id")
     private String id;
 
@@ -35,7 +34,8 @@ public class TodoList {
      *
      * @return id
      */
-    @ApiModelProperty(value = "")
+
+    @Schema(name = "id", required = false)
     public String getId() {
         return id;
     }
@@ -54,8 +54,8 @@ public class TodoList {
      *
      * @return name
      */
-    @ApiModelProperty(required = true, value = "")
     @NotNull
+    @Schema(name = "name", required = true)
     public String getName() {
         return name;
     }
@@ -74,7 +74,8 @@ public class TodoList {
      *
      * @return description
      */
-    @ApiModelProperty(value = "")
+
+    @Schema(name = "description", required = false)
     public String getDescription() {
         return description;
     }
@@ -106,7 +107,6 @@ public class TodoList {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class TodoList {\n");
-
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
