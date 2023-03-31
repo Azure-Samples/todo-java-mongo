@@ -35,6 +35,7 @@ var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = { 'azd-env-name': environmentName }
 
+// The name of the web app resource
 var webName = !empty(webServiceName) ? webServiceName : '${abbrs.webSitesAppService}web-${resourceToken}'
 
 // Organize resources in a resource group
@@ -77,7 +78,7 @@ module api './app/api.bicep' = {
   }
 }
 
-// Set web app settings to point to the API
+// Set additional web app settings
 module webSettings './core/host/appservice-appsettings-append.bicep' = {
   name: 'websettings'
   scope: rg
