@@ -60,9 +60,6 @@ param collections array = [
   }
 ]
 
-@description('API Management SKU to use if APIM is enabled')
-param apimSku string = 'Basic'
-
 @description('Flag to use Azure API Management to mediate the calls between the Web frontend and the backend API')
 param useAPIM bool = false
 
@@ -268,7 +265,6 @@ module apim 'br/public:avm/res/api-management/service:0.1.3' = if (useAPIM) {
     publisherName: 'n/a'
     location: location
     tags: tags
-    sku: apimSku
     apis: [
       {
         name: 'todo-api'
