@@ -273,10 +273,10 @@ module apim 'br/public:avm/res/api-management/service:0.1.3' = if (useAPIM) {
         apiDescription: 'This is a simple Todo API'
         serviceUrl: 'https://${api.outputs.defaultHostname}'
         subscriptionRequired: false
-        value: loadTextContent('../../../api/common/openapi.yaml')
+        value: loadTextContent('../src/api/openapi.yaml')
         policies: [
           {
-            value: replace(loadTextContent('../../../common/infra/shared/gateway/apim/apim-api-policy.xml'), '{origin}', 'https://${web.outputs.defaultHostname}')
+            value: replace(loadTextContent('./app/apim-api-policy.xml'), '{origin}', 'https://${web.outputs.defaultHostname}')
             format: 'rawxml'
           }
         ]
