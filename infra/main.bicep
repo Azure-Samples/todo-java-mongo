@@ -154,20 +154,31 @@ module api 'br/public:avm/res/web/site:0.2.0' = {
 }
 
 // Give the API access to KeyVault
-module apiKeyVaultAccess './app/keyvault-secret.bicep' = {
-  name: 'api-keyvault-access'
+module accesskeyvault 'br/public:avm/res/key-vault/vault:0.3.5' = {
+  name: 'accesskeyvault'
   scope: rg
-  params: {  
-    apiPrincipalId: api.outputs.systemAssignedMIPrincipalId
-    cosmosDbId: cosmos.outputs.resourceId
-    keyVaultName: keyVault.outputs.name
-    principalId: principalId
-    connectionStringKey: connectionStringKey
+  params: {
+    name: keyVault.outputs.name
+    enableRbacAuthorization: false
+    accessPolicies: [
+      {
+        objectId: principalId
+        permissions: {
+          secrets: [ 'get', 'list' ]
+        }
+      }
+      {
+        objectId: api.outputs.systemAssignedMIPrincipalId
+        permissions: {
+          secrets: [ 'get', 'list' ]
+        }
+      }
+    ]
   }
 }
 
 // The application database
-module cosmos 'br/public:avm/res/document-db/database-account:0.3.0' = {
+module cosmos 'br/public:avm/res/document-db/database-account:0.4.0' = {
   name: 'cosmos'
   scope: rg
   params: {
@@ -186,8 +197,11 @@ module cosmos 'br/public:avm/res/document-db/database-account:0.3.0' = {
         tags: tags
         collections: collections
       }
-
     ]
+    secretsKeyVault: {
+      keyVaultName: keyVault.outputs.name
+      primaryWriteConnectionStringSecretName: connectionStringKey
+    }
   }
 }
 
@@ -309,8 +323,7 @@ output AZURE_KEY_VAULT_ENDPOINT string = keyVault.outputs.uri
 output AZURE_KEY_VAULT_NAME string = keyVault.outputs.name
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
-output REACT_APP_API_BASE_URL string = useAPIM ? 'https://${apim.outputs.name}.azure-api.net/todo' : 'https://${api.outputs.defaultHostname}'
-output REACT_APP_APPLICATIONINSIGHTS_CONNECTION_STRING string = applicationInsights.outputs.connectionString
+output API_BASE_URL string = useAPIM ? 'https://${apim.outputs.name}.azure-api.net/todo' : 'https://${api.outputs.defaultHostname}'
 output REACT_APP_WEB_BASE_URL string = 'https://${web.outputs.defaultHostname}'
 output USE_APIM bool = useAPIM
 output SERVICE_API_ENDPOINTS array = useAPIM ? [ 'https://${apim.outputs.name}.azure-api.net/todo', 'https://${api.outputs.defaultHostname}' ]: []
