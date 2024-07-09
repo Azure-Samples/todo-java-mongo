@@ -164,7 +164,6 @@ module accessKeyVault 'br/public:avm/res/key-vault/vault:0.3.5' = {
   scope: rg
   params: {
     name: keyVault.outputs.name
-    enablePurgeProtection: false
     enableRbacAuthorization: false
     accessPolicies: [
       {
@@ -234,10 +233,12 @@ module keyVault 'br/public:avm/res/key-vault/vault:0.3.5' = {
   scope: rg
   params: {
     name: !empty(keyVaultName) ? keyVaultName : '${abbrs.keyVaultVaults}${resourceToken}'
-    enablePurgeProtection: false
     location: location
     tags: tags
     enableRbacAuthorization: false
+    enableVaultForDeployment: false
+    enableVaultForTemplateDeployment: false
+    sku: 'standard'
   }
 }
 
