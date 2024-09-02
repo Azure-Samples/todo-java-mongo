@@ -124,6 +124,7 @@ module api './app/api-avm.bicep' = {
       AZURE_COSMOS_ENDPOINT: 'https://${cosmos.outputs.name}.mongo.cosmos.azure.com:443/'
       API_ALLOW_ORIGINS: web.outputs.SERVICE_WEB_URI
       JAVA_OPTS: join(concat([], [ '-Djdk.attach.allowAttachSelf=true' ]), ' ')
+      SCM_DO_BUILD_DURING_DEPLOYMENT: true
     }
     appInsightResourceId: applicationInsights.outputs.resourceId
     linuxFxVersion: 'java|17-java17'
